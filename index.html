@@ -8,6 +8,7 @@
   :root{ --swiss:#d40000; --ink:#1a1a1a; --muted:#6b7280; --line:#e5e7eb; --bg:#f6f6f6; }
   *{box-sizing:border-box}
   body{margin:0; font-family:system-ui,-apple-system,"Helvetica Neue",Helvetica,Arial,sans-serif; color:var(--ink); background:var(--bg);}
+
   /* Topbar */
   .topbar{background:#fff; border-bottom:1px solid var(--line);}
   .topbar-inner{max-width:1100px; margin:0 auto; padding:10px 16px; display:flex; align-items:center; gap:12px;}
@@ -16,27 +17,40 @@
   .logo-mark:before{content:""; position:absolute; width:16px; height:4px; left:50%; top:50%; transform:translate(-50%,-50%); background:#fff}
   .logo-mark:after{content:""; position:absolute; width:4px; height:16px; left:50%; top:50%; transform:translate(-50%,-50%); background:#fff}
   .brand-small{color:var(--muted); font-weight:600}
+
   /* Hero */
   .hero{background:linear-gradient(135deg,#fff 0%,#fff 55%,#ffe9e9 100%); border-bottom:1px solid var(--line);}
   .hero-inner{max-width:1100px; margin:0 auto; padding:24px 16px; display:flex; gap:18px; align-items:center; justify-content:space-between; flex-wrap:wrap}
+  .hero-inner.with-images{display:flex; align-items:center; justify-content:space-between}
+  .hero-center{flex:1; text-align:center}
   .hero-title{font-size:28px; font-weight:800; letter-spacing:.3px}
-  .hero-badges{display:flex; gap:8px; flex-wrap:wrap}
+  .hero-badges{display:flex; gap:8px; flex-wrap:wrap; justify-content:center; margin-top:8px}
   .badge{display:inline-flex; align-items:center; gap:8px; background:#fff; border:1px solid var(--line); border-radius:999px; padding:8px 12px; font-weight:600}
   .badge .dot{width:10px; height:10px; border-radius:50%; background:var(--swiss)}
   .badge .flag{font-size:16px}
   .badge .boat{font-size:15px}
+  .side-img{max-height:160px; object-fit:contain}
+  .left-img{margin-right:20px}
+  .right-img{margin-left:20px}
+  @media(max-width:720px){
+    .hero-inner.with-images{flex-direction:column}
+    .side-img{max-height:120px; margin:10px 0}
+  }
+
   /* Steps */
   .steps{max-width:1100px; margin:14px auto 0; padding:0 16px 20px; display:flex; gap:14px; color:var(--muted); font-size:13px}
   .step{display:flex; align-items:center; gap:8px}
   .step .num{width:22px; height:22px; border-radius:50%; background:#fff; border:1px solid var(--line); display:inline-flex; align-items:center; justify-content:center; font-weight:700}
   .step.active .num{background:var(--swiss); color:#fff; border-color:var(--swiss)}
   .divider{flex:1; height:1px; background:var(--line); align-self:center}
+
   /* Main card */
   .wrap{max-width:1100px; margin:0 auto; padding:0 16px 28px}
   .card{background:#fff; border:1px solid var(--line); border-radius:14px; box-shadow:0 2px 6px rgba(0,0,0,.04)}
   .card-inner{padding:18px}
   .card h2{margin:0 0 8px; font-size:18px}
   .note{color:var(--muted); font-size:13px}
+
   /* Form */
   .grid{display:grid; grid-template-columns:1fr; gap:12px; margin-top:10px}
   @media(min-width:720px){ .grid{ grid-template-columns: 1fr auto; } }
@@ -48,19 +62,24 @@
   .btn.secondary{background:#fff; color:var(--swiss)}
   .btn.small{padding:6px 10px; font-size:12px; border-radius:8px; font-weight:600}
   .inline-help{font-size:12px; color:var(--muted)}
+
   /* Info strip */
   .strip{display:flex; gap:16px; flex-wrap:wrap; margin-top:14px}
   .chip{display:flex; align-items:center; gap:8px; border:1px dashed var(--line); border-radius:10px; padding:8px 10px; font-size:13px; background:#fff; flex-wrap:wrap}
   .chip .icon{font-size:16px}
+
   /* Footer */
-  footer{max-width:1100px; margin:18px auto 28px; padding:0 16px; color:var(--muted); font-size:12px; display:flex; justify-content:space-between; gap:10px; flex-wrap:wrap}
-  a{color:var(--swiss);}
+  footer{max-width:1100px; margin:18px auto 28px; padding:0 16px; color:#777; font-size:12px; display:flex; justify-content:space-between; gap:10px; flex-wrap:wrap}
+  a{color:var(--swiss)}
   a:hover{text-decoration:underline}
+
   /* Kein Preview */
   canvas{display:none}
 </style>
 </head>
 <body>
+
+<!-- Topbar -->
 <div class="topbar">
   <div class="topbar-inner">
     <div class="logo">
@@ -71,20 +90,24 @@
   </div>
 </div>
 
+<!-- Hero mit Bildern -->
 <section class="hero">
-  <div class="hero-inner">
-    <div>
+  <div class="hero-inner with-images">
+    <img src="minion.png" alt="Minion-Pilot mit Swiss-Flagge" class="side-img left-img">
+    <div class="hero-center">
       <div class="hero-title">Online Check-in</div>
       <div class="note">Starte deinen Check-in und lade deinen personalisierten Boarding Pass herunter.</div>
+      <div class="hero-badges">
+        <span class="badge"><span class="dot"></span> Zürich-Style</span>
+        <span class="badge"><span class="flag">🇨🇭</span> Schweiz</span>
+        <span class="badge"><span class="boat">⛵</span> Bootsparty</span>
+      </div>
     </div>
-    <div class="hero-badges">
-      <span class="badge"><span class="dot"></span> Zürich-Style</span>
-      <span class="badge"><span class="flag">🇨🇭</span> Schweiz</span>
-      <span class="badge"><span class="boat">⛵</span> Bootsparty</span>
-    </div>
+    <img src="boat.png" alt="Swiss Boat" class="side-img right-img">
   </div>
 </section>
 
+<!-- Steps -->
 <div class="steps">
   <div class="step active"><span class="num">1</span> Name</div>
   <div class="divider"></div>
@@ -93,6 +116,7 @@
   <div class="step"><span class="num">3</span> Ready to board</div>
 </div>
 
+<!-- Main card -->
 <div class="wrap">
   <div class="card">
     <div class="card-inner">
@@ -102,7 +126,7 @@
       <div class="grid">
         <div class="field">
           <label for="name">Passenger Name (wie auf der Einladung)</label>
-          <input id="name" type="text" placeholder="z. B. Pilot Minion" autocomplete="name" />
+          <input id="name" type="text" placeholder="z. B. Bernadette Keller" autocomplete="name" />
         </div>
         <div class="actions">
           <button class="btn" id="download">Boarding Pass herunterladen</button>
@@ -113,11 +137,7 @@
       <div class="strip">
         <div class="chip">
           <span class="icon">🕔</span> Treffpunkt: 31.08.2025 · 17:00 · Historischer Hafen Berlin
-                  <a class="btn secondary small" 
-                     href="https://www.google.com/maps/dir/?api=1&destination=M%C3%A4rkisches+Ufer+10179+Berlin" 
-                     target="_blank">
-                    Route
-                  </a>
+          <a class="btn secondary small" href="https://www.google.com/maps/dir/?api=1&destination=M%C3%A4rkisches+Ufer+10179+Berlin" target="_blank">Route</a>
         </div>
         <div class="chip"><span class="icon">🎭</span> Dresscode: Schweiz-Motto</div>
         <div class="chip"><span class="icon">📸</span> Fotobuch & Polaroid an Bord</div>
@@ -133,55 +153,70 @@
   </div>
 </div>
 
+<!-- Footer -->
 <footer>
   <span>© 2025 Swiss Airlines – Boat Party (inoffiziell)</span>
   <span><a href="infos.html">Weitere Informationen</a></span>
 </footer>
 
+<!-- Script: render ohne Vorschau, Download direkt -->
 <script>
 (() => {
-  const BASE_IMAGE_URL = 'ticket_base.png';
+  const BASE_IMAGE_URL = 'ticket_base.png';      // Ticket ohne Namen (PNG)
   const FONT_FAMILY = "'Helvetica Neue', Helvetica, Arial, system-ui, sans-serif";
   const FONT_WEIGHT = 700;
   const TEXT_COLOR = "#111";
-  const STROKE = {show:true, width:4, color:"#ffffff"};
+  const STROKE = {show:true, width:4, color:"#ffffff"};     // feine Kontur für Lesbarkeit
   const NAME_FONT_SIZE = 28;
-  const baseX = 180; 
-  const baseY = 293;
+
+  // Position rechts neben dem (auf dem Ticket gedruckten) "Passenger Name:"
+  const baseX = 180;   // X-Start der Labelzeile (bei Bedarf anpassen)
+  const baseY = 293;   // Y-Position der Zeile
   const labelText = "Passenger Name:";
-  const gap = 20;
+  const gap = 20;      // Abstand Label -> Name
 
   const els = { name: document.getElementById('name'), download: document.getElementById('download') };
+
+  // Unsichtbares Canvas (kein Preview)
   const canvas = document.createElement('canvas');
-  canvas.width = 1536;
+  canvas.width = 1536;   // ggf. auf deine Ticketgröße anpassen
   canvas.height = 1024;
   const ctx = canvas.getContext('2d');
+
   const img = new Image();
   img.src = BASE_IMAGE_URL;
 
   function drawAndDownload(){
     const name = (els.name.value || '').trim();
     if(!name){ alert('Bitte trage deinen Namen ein.'); return; }
+
     ctx.clearRect(0,0,canvas.width,canvas.height);
     ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
+
     ctx.font = `${FONT_WEIGHT} ${NAME_FONT_SIZE}px ${FONT_FAMILY}`;
     ctx.textBaseline = "top";
     ctx.fillStyle = TEXT_COLOR;
+
+    // Name direkt rechts neben das Label setzen
     const labelWidth = ctx.measureText(labelText).width;
     const nameX = baseX + labelWidth + gap;
     const nameY = baseY;
+
     if (STROKE.show){
       ctx.lineWidth = STROKE.width;
       ctx.strokeStyle = STROKE.color;
       ctx.strokeText(name, nameX, nameY);
     }
     ctx.fillText(name, nameX, nameY);
+
+    // Download
     const a = document.createElement('a');
     const clean = name.replace(/[^\w\-äöüÄÖÜß ]+/g,'').trim().replace(/\s+/g,'_');
     a.download = `BoardingPass_${clean}.png`;
     a.href = canvas.toDataURL('image/png');
     a.click();
   }
+
   els.download.addEventListener('click', drawAndDownload);
 })();
 </script>
