@@ -18,8 +18,6 @@
   button{appearance:none; border:1px solid var(--accent); background:var(--accent); color:#fff; padding:10px 14px; border-radius:10px; font-weight:600; cursor:pointer}
   .canvas-wrap{padding:16px; display:flex; justify-content:center; align-items:center}
   canvas{max-width:100%; height:auto; background:#fff; border-radius:10px; border:1px solid #eee}
-  .admin{display:none; padding:0 16px 16px}
-  .admin .row{margin-top:8px}
   .hint{padding:0 16px 16px; color:#666; font-size:12px}
 </style>
 </head>
@@ -27,23 +25,12 @@
 <header><h1>Swiss Boarding Pass – Name eintragen & herunterladen</h1></header>
 
 <main>
-  <!-- Public: nur Name + Download -->
   <section class="card pad">
     <div class="row">
       <label for="name">Passenger Name:</label>
-      <input id="name" type="text" placeholder="z.B. Pilot Minion" />
+      <input id="name" type="text" placeholder="z. B. Pilot Minion" />
       <button id="download">Get your Boarding Pass</button>
     </div>
-  </section>
-
-  <!-- Admin-Feintuning (nur sichtbar bei ?admin=1) -->
-  <section id="admin" class="card admin">
-    <div class="row"><label for="size">Schriftgröße</label><input id="size" type="range" min="18" max="60" value="28"></div>
-    <div class="row"><label for="x">X-Position</label><input id="x" type="range" min="0" max="1600" value="120"></div>
-    <div class="row"><label for="y">Y-Position</label><input id="y" type="range" min="0" max="900" value="205"></div>
-    <div class="row"><label for="width">Max Breite</label><input id="width" type="range" min="200" max="1400" value="680"></div>
-    <div class="row"><label for="letter">Buchstabenabstand</label><input id="letter" type="range" min="0" max="4" step="0.1" value="0"></div>
-    <p class="hint">Admin-Modus – Werte einmal einstellen, dann URL ohne <code>?admin=1</code> an Gäste geben.</p>
   </section>
 
   <section class="card canvas-wrap">
@@ -54,41 +41,22 @@
 
 <script>
 (() => {
-  // === Einstellungen ===
   const BASE_IMAGE_URL = 'ticket_base.png';      // Ticket ohne Namen (PNG)
-  let POS = { size:28, x:120, y:205, width:680, letter:0 }; // Standardwerte
   const FONT_FAMILY = "'Helvetica Neue', Helvetica, Arial, system-ui, sans-serif";
   const FONT_WEIGHT = 700;
   const TEXT_COLOR = "#111";
-  const STROKE = {show:true, width:4, color:"#ffffff"};     // dünne weiße Kontur
-  const UPPERCASE = false;
-
-  // Admin-Modus via ?admin=1
-  const params = new URLSearchParams(location.search);
-  const isAdmin = params.get('admin') === '1';
-  if (isAdmin) document.getElementById('admin').style.display = 'block';
+  const STROKE = {show:true, width:4, color:"#ffffff"};     // dünne weiße Kontur hinter dem Namen
+  const NAME_FONT_SIZE = 28;                                 // feste Schriftgröße für Name & Label
 
   const els = {
     name: document.getElementById('name'),
     download: document.getElementById('download'),
-    canvas: document.getElementById('c'),
-    size: document.getElementById('size'),
-    x: document.getElementById('x'),
-    y: document.getElementById('y'),
-    width: document.getElementById('width'),
-    letter: document.getElementById('letter')
+    canvas: document.getElementById('c')
   };
   const ctx = els.canvas.getContext('2d');
 
-  // Admin-Slider an POS binden
-  ['size','x','y','width','letter'].forEach(k=>{
-    if(!els[k]) return;
-    els[k].addEventListener('input', ()=>{ POS[k] = +els[k].value; draw(); });
-    POS[k] = +els[k].value;
-  });
-
   const img = new Image();
-  img.src = BASE_IMAGE_URL + '?v=' + Date.now();  // Cache busting beim ersten Laden
+  img.src = BASE_IMAGE_URL + '?v=' + Date.now();
   img.onload = draw;
   img.onerror = () => {
     ctx.fillStyle = "#fff"; ctx.fillRect(0,0,els.canvas.width,els.canvas.height);
@@ -96,36 +64,37 @@
     ctx.fillText("ticket_base.png nicht gefunden – lade dein Ticketbild hoch.", 24, 40);
   };
 
-  function applyFont(px){ ctx.font = `${FONT_WEIGHT} ${px}px ${FONT_FAMILY}`; ctx.fillStyle = TEXT_COLOR; ctx.textBaseline = "alphabetic"; }
-
-  function drawSpacedLine(str, x, y, letterSpacing){
-    let cx = x;
-    for (let i=0;i<str.length;i++){
-      const ch = str[i];
-      if (STROKE.show){ ctx.lineWidth = STROKE.width; ctx.strokeStyle = STROKE.color; ctx.strokeText(ch, cx, y); }
-      ctx.fillText(ch, cx, y);
-      cx += ctx.measureText(ch).width + (i<str.length-1 ? letterSpacing : 0);
-    }
-  }
-  function wrapAndDraw(text, x, y, maxWidth, lh, letterSpacing){
-    const words = text.split(/\s+/); let line = ''; let cy = y;
-    const mw = s => { let w=0; for (let i=0;i<s.length;i++){ w+=ctx.measureText(s[i]).width; if(i<s.length-1) w+=letterSpacing; } return w; };
-    for (let n=0;n<words.length;n++){
-      const test = (line? line+' ' : '') + words[n];
-      if (mw(test) > maxWidth && n>0){ drawSpacedLine(line, x, cy, letterSpacing); line = words[n]; cy += lh; }
-      else { line = test; }
-    }
-    drawSpacedLine(line, x, cy, letterSpacing);
-  }
+  // Position der Beschriftung auf dem Ticket (bei Bedarf einmalig anpassen)
+  const baseX = 120;   // x-Startpunkt der Label-Zeile
+  const baseY = 205;   // y-Position der Label-Zeile
+  const labelText = "Passenger Name:";
+  const gap = 20;      // Abstand zwischen Label und Name
 
   function draw(){
     ctx.clearRect(0,0,els.canvas.width,els.canvas.height);
     ctx.drawImage(img, 0, 0, els.canvas.width, els.canvas.height);
-    let name = (els.name.value || '').trim();
-    if (UPPERCASE) name = name.toUpperCase();
+
+    // Schrift setzen
+    ctx.font = `${FONT_WEIGHT} ${NAME_FONT_SIZE}px ${FONT_FAMILY}`;
+    ctx.textBaseline = "top";
+    ctx.fillStyle = TEXT_COLOR;
+
+    // Falls das Label NICHT Teil deines Basistickets ist, kannst du es hier mitzeichnen:
+    // ctx.fillText(labelText, baseX, baseY);
+
+    const name = (els.name.value || '').trim();
     if (!name) return;
-    applyFont(POS.size);
-    wrapAndDraw(name, POS.x, POS.y, POS.width, Math.round(POS.size*1.25), POS.letter);
+
+    const labelWidth = ctx.measureText(labelText).width;
+    const nameX = baseX + labelWidth + gap;
+    const nameY = baseY;
+
+    if (STROKE.show){
+      ctx.lineWidth = STROKE.width;
+      ctx.strokeStyle = STROKE.color;
+      ctx.strokeText(name, nameX, nameY);
+    }
+    ctx.fillText(name, nameX, nameY);
   }
 
   els.name.addEventListener('input', draw);
