@@ -3,66 +3,158 @@
 <head>
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width,initial-scale=1" />
-<title>Swiss Boarding Pass – Abruf</title>
+<title>Swiss Boat Party – Online Check-in</title>
 <style>
-  :root{ --accent:#d40000; --label:#222; }
-  body{font-family:system-ui,-apple-system,Segoe UI,Roboto,Helvetica,Arial,sans-serif; margin:0; background:#f6f6f6;}
-  header{background:white; padding:14px 18px; border-bottom:1px solid #e5e5e5;}
-  header h1{margin:0; font-size:18px}
-  main{max-width:980px; margin:18px auto; padding:0 16px 28px; display:grid; gap:16px;}
-  .card{background:#fff; border:1px solid #e7e7e7; border-radius:12px; box-shadow:0 1px 2px rgba(0,0,0,.03);}
-  .row{display:flex; gap:10px; align-items:center}
-  .pad{padding:16px}
-  label{font-size:14px; color:var(--label); white-space:nowrap}
-  input[type="text"]{flex:1; padding:12px 14px; border:1px solid #ddd; border-radius:10px; font-size:16px}
-  button{appearance:none; border:1px solid var(--accent); background:var(--accent); color:#fff; padding:10px 14px; border-radius:10px; font-weight:600; cursor:pointer}
-  .hint{padding:0 16px 16px; color:#666; font-size:12px}
+  :root{ --swiss:#d40000; --ink:#1a1a1a; --muted:#6b7280; --line:#e5e7eb; --bg:#f6f6f6; }
+  *{box-sizing:border-box}
+  body{margin:0; font-family:system-ui,-apple-system,"Helvetica Neue",Helvetica,Arial,sans-serif; color:var(--ink); background:var(--bg);}
+  /* Topbar */
+  .topbar{background:#fff; border-bottom:1px solid var(--line);}
+  .topbar-inner{max-width:1100px; margin:0 auto; padding:10px 16px; display:flex; align-items:center; gap:12px;}
+  .logo{display:flex; align-items:center; gap:10px; font-weight:800; text-transform:uppercase; letter-spacing:.5px;}
+  .logo-mark{width:28px; height:28px; border-radius:6px; background:var(--swiss); position:relative}
+  .logo-mark:before{content:""; position:absolute; width:16px; height:4px; left:50%; top:50%; transform:translate(-50%,-50%); background:#fff}
+  .logo-mark:after{content:""; position:absolute; width:4px; height:16px; left:50%; top:50%; transform:translate(-50%,-50%); background:#fff}
+  .brand-small{color:var(--muted); font-weight:600}
+  /* Hero */
+  .hero{background:linear-gradient(135deg,#fff 0%,#fff 55%,#ffe9e9 100%); border-bottom:1px solid var(--line);}
+  .hero-inner{max-width:1100px; margin:0 auto; padding:24px 16px; display:flex; gap:18px; align-items:center; justify-content:space-between; flex-wrap:wrap}
+  .hero-title{font-size:28px; font-weight:800; letter-spacing:.3px}
+  .hero-badges{display:flex; gap:8px; flex-wrap:wrap}
+  .badge{display:inline-flex; align-items:center; gap:8px; background:#fff; border:1px solid var(--line); border-radius:999px; padding:8px 12px; font-weight:600}
+  .badge .dot{width:10px; height:10px; border-radius:50%; background:var(--swiss)}
+  .badge .flag{font-size:16px}
+  .badge .boat{font-size:15px}
+  /* Steps */
+  .steps{max-width:1100px; margin:14px auto 0; padding:0 16px 20px; display:flex; gap:14px; color:var(--muted); font-size:13px}
+  .step{display:flex; align-items:center; gap:8px}
+  .step .num{width:22px; height:22px; border-radius:50%; background:#fff; border:1px solid var(--line); display:inline-flex; align-items:center; justify-content:center; font-weight:700}
+  .step.active .num{background:var(--swiss); color:#fff; border-color:var(--swiss)}
+  .divider{flex:1; height:1px; background:var(--line); align-self:center}
+  /* Main card */
+  .wrap{max-width:1100px; margin:0 auto; padding:0 16px 28px}
+  .card{background:#fff; border:1px solid var(--line); border-radius:14px; box-shadow:0 2px 6px rgba(0,0,0,.04)}
+  .card-inner{padding:18px}
+  .card h2{margin:0 0 8px; font-size:18px}
+  .note{color:var(--muted); font-size:13px}
+  /* Form */
+  .grid{display:grid; grid-template-columns:1fr; gap:12px; margin-top:10px}
+  @media(min-width:720px){ .grid{ grid-template-columns: 1fr auto; } }
+  label{font-size:13px; color:var(--muted); font-weight:600}
+  .field{display:flex; flex-direction:column; gap:6px}
+  input[type="text"]{padding:12px 14px; border:1px solid var(--line); border-radius:10px; font-size:16px}
+  .actions{display:flex; gap:10px; flex-wrap:wrap; align-items:center}
+  .btn{appearance:none; border:1px solid var(--swiss); background:var(--swiss); color:#fff; padding:12px 16px; border-radius:12px; font-weight:800; cursor:pointer}
+  .btn.secondary{background:#fff; color:var(--swiss)}
+  .inline-help{font-size:12px; color:var(--muted)}
+  /* Info strip */
+  .strip{display:flex; gap:16px; flex-wrap:wrap; margin-top:14px}
+  .chip{display:flex; align-items:center; gap:8px; border:1px dashed var(--line); border-radius:10px; padding:8px 10px; font-size:13px; background:#fff}
+  .chip .icon{font-size:16px}
+  /* Footer */
+  footer{max-width:1100px; margin:18px auto 28px; padding:0 16px; color:var(--muted); font-size:12px; display:flex; justify-content:space-between; gap:10px; flex-wrap:wrap}
+  a{color:var(--swiss); text-decoration:none}
+  a:hover{text-decoration:underline}
+  /* Kein Preview */
+  canvas{display:none}
 </style>
 </head>
 <body>
-<header><h1>Swiss Boarding Pass – Name eintragen & herunterladen</h1></header>
-
-<main>
-  <section class="card pad">
-    <div class="row">
-      <label for="name">Passenger Name:</label>
-      <input id="name" type="text" placeholder="z. B. Pilot Minion" />
-      <button id="download">Get your Boarding Pass</button>
+<div class="topbar">
+  <div class="topbar-inner">
+    <div class="logo">
+      <div class="logo-mark" aria-hidden="true"></div>
+      <span>Swiss Airlines</span>
+      <span class="brand-small">Boat Party</span>
     </div>
-  </section>
+  </div>
+</div>
 
-  <p class="hint">Dein Boarding Pass wird nicht angezeigt, sondern direkt als Datei heruntergeladen.</p>
-</main>
+<section class="hero">
+  <div class="hero-inner">
+    <div>
+      <div class="hero-title">Online Check-in</div>
+      <div class="note">Starte deinen Check-in und lade deinen personalisierten Boarding Pass herunter.</div>
+    </div>
+    <div class="hero-badges">
+      <span class="badge"><span class="dot"></span> Zürich-Style</span>
+      <span class="badge"><span class="flag">🇨🇭</span> Schweiz</span>
+      <span class="badge"><span class="boat">⛵</span> Bootsparty</span>
+    </div>
+  </div>
+</section>
+
+<div class="steps">
+  <div class="step active"><span class="num">1</span> Name</div>
+  <div class="divider"></div>
+  <div class="step"><span class="num">2</span> Boarding Pass</div>
+  <div class="divider"></div>
+  <div class="step"><span class="num">3</span> Ready to board</div>
+</div>
+
+<div class="wrap">
+  <div class="card">
+    <div class="card-inner">
+      <h2>Passagierdaten</h2>
+      <p class="note">Bitte trage deinen Namen ein. Dein Boarding Pass wird erst beim Download erzeugt (keine Vorschau).</p>
+
+      <div class="grid">
+        <div class="field">
+          <label for="name">Passenger Name (wie auf der Einladung)</label>
+          <input id="name" type="text" placeholder="z. B. Bernadette Keller" autocomplete="name" />
+        </div>
+        <div class="actions">
+          <button class="btn" id="download">Boarding Pass herunterladen</button>
+          <a class="btn secondary" href="infos.html">Event-Infos</a>
+        </div>
+      </div>
+
+      <div class="strip">
+        <div class="chip"><span class="icon">🕔</span> Treffpunkt: 31.08.2025 · 17:00 · Historischer Hafen Berlin</div>
+        <div class="chip"><span class="icon">🎭</span> Dresscode: Schweiz-Motto</div>
+        <div class="chip"><span class="icon">📸</span> Fotobuch & Polaroid an Bord</div>
+        <div class="chip"><span class="icon">🎵</span> Musikwunsch? An Laurin</div>
+      </div>
+
+      <p class="inline-help" style="margin-top:10px">Hinweis: Mit dem Download stimmst du der einmaligen Verarbeitung deines Namens zur Erstellung des Boarding Pass zu. Es werden keine Daten gespeichert.</p>
+    </div>
+  </div>
+</div>
+
+<footer>
+  <span>© 2025 Swiss Airlines – Boat Party (inoffiziell)</span>
+  <span><a href="infos.html">Weitere Informationen</a></span>
+</footer>
 
 <script>
 (() => {
-  const BASE_IMAGE_URL = 'ticket_base.png';      // Ticket ohne Namen (PNG)
+  const BASE_IMAGE_URL = 'ticket_base.png'; // Ticket ohne Namen (PNG) im gleichen Ordner
   const FONT_FAMILY = "'Helvetica Neue', Helvetica, Arial, system-ui, sans-serif";
   const FONT_WEIGHT = 700;
   const TEXT_COLOR = "#111";
-  const STROKE = {show:true, width:4, color:"#ffffff"};
+  const STROKE = {show:true, width:4, color:"#ffffff"}; // feine Kontur
   const NAME_FONT_SIZE = 28;
+  // Position rechts neben dem auf dem Ticket gedruckten "Passenger Name:"
+  const baseX = 180;   // X-Start der Labelzeile (bei Bedarf anpassen)
+  const baseY = 293;   // Y-Position der Zeile
+  const labelText = "Passenger Name:";
+  const gap = 20;      // Abstand Label -> Name
 
-  const els = {
-    name: document.getElementById('name'),
-    download: document.getElementById('download')
-  };
+  const els = { name: document.getElementById('name'), download: document.getElementById('download') };
 
-  // Verstecktes Canvas (nicht im Layout sichtbar)
+  // Unsichtbares Canvas (kein Preview)
   const canvas = document.createElement('canvas');
-  canvas.width = 1536;
+  canvas.width = 1536;  // an Ticketauflösung anpassen
   canvas.height = 1024;
   const ctx = canvas.getContext('2d');
 
   const img = new Image();
   img.src = BASE_IMAGE_URL;
 
-  const baseX = 180; 
-  const baseY = 293; 
-  const labelText = "Passenger Name:";
-  const gap = 20;
-
   function drawAndDownload(){
+    const name = (els.name.value || '').trim();
+    if(!name){ alert('Bitte trage deinen Namen ein.'); return; }
+
     ctx.clearRect(0,0,canvas.width,canvas.height);
     ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
 
@@ -70,9 +162,7 @@
     ctx.textBaseline = "top";
     ctx.fillStyle = TEXT_COLOR;
 
-    const name = (els.name.value || '').trim();
-    if (!name) return;
-
+    // Name direkt rechts neben das (im Ticket gedruckte) Label setzen:
     const labelWidth = ctx.measureText(labelText).width;
     const nameX = baseX + labelWidth + gap;
     const nameY = baseY;
@@ -84,9 +174,8 @@
     }
     ctx.fillText(name, nameX, nameY);
 
-    // Download starten
     const a = document.createElement('a');
-    const clean = (name || 'Passenger').replace(/[^\w\-äöüÄÖÜß ]+/g,'').trim().replace(/\s+/g,'_');
+    const clean = name.replace(/[^\w\-äöüÄÖÜß ]+/g,'').trim().replace(/\s+/g,'_');
     a.download = `BoardingPass_${clean}.png`;
     a.href = canvas.toDataURL('image/png');
     a.click();
