@@ -1,0 +1,206 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+<title>Swiss Boarding Pass – Name Generator</title>
+<style>
+  :root{ --accent:#d40000; --label:#333; }
+  body{font-family:system-ui,-apple-system,Segoe UI,Roboto,Helvetica,Arial,sans-serif; margin:0; background:#f6f6f6;}
+  header{background:white; padding:14px 18px; border-bottom:1px solid #e5e5e5;}
+  header h1{margin:0; font-size:18px; letter-spacing:.2px;}
+  main{max-width:980px; margin:18px auto; padding:0 16px 28px; display:grid; gap:16px;}
+  .card{background:#fff; border:1px solid #e7e7e7; border-radius:12px; box-shadow:0 1px 2px rgba(0,0,0,.03);}
+  .controls{padding:14px 16px; display:grid; grid-template-columns:1fr 1fr; gap:12px 16px; align-items:end;}
+  .controls .row{display:flex; gap:8px; align-items:center}
+  .controls label{font-size:12px; color:var(--label); white-space:nowrap}
+  .controls input[type="text"]{flex:1; padding:10px 12px; border:1px solid #ddd; border-radius:8px; font-size:16px}
+  .controls input[type="range"]{width:100%}
+  .controls .btns{grid-column:1/-1; display:flex; gap:8px; flex-wrap:wrap}
+  button{appearance:none; border:1px solid var(--accent); background:var(--accent); color:#fff; padding:10px 14px; border-radius:10px; font-weight:600; cursor:pointer}
+  button.secondary{background:#fff; color:var(--accent)}
+  .canvas-wrap{padding:16px; display:flex; justify-content:center; align-items:center}
+  canvas{max-width:100%; height:auto; background:#fff; border-radius:10px; border:1px solid #eee}
+  .hint{padding:0 16px 16px; color:#666; font-size:12px}
+  footer{color:#888; font-size:12px; text-align:center; padding:10px 0 24px}
+</style>
+</head>
+<body>
+<header><h1>Swiss Boarding Pass • Name eintragen & herunterladen</h1></header>
+
+<main>
+  <section class="card controls">
+    <div class="row" style="grid-column:1/-1">
+      <label for="name" style="min-width:115px">Passenger Name:</label>
+      <input id="name" type="text" placeholder="z. B. Bernadette Keller" />
+    </div>
+
+    <div class="row">
+      <label for="size">Schriftgröße</label>
+      <input id="size" type="range" min="18" max="60" value="28" />
+    </div>
+    <div class="row">
+      <label for="x">X-Position</label>
+      <input id="x" type="range" min="0" max="1600" value="120" />
+    </div>
+    <div class="row">
+      <label for="y">Y-Position</label>
+      <input id="y" type="range" min="0" max="900" value="205" />
+    </div>
+    <div class="row">
+      <label for="width">Max Breite</label>
+      <input id="width" type="range" min="200" max="1400" value="680" />
+    </div>
+    <div class="row">
+      <label for="letter">Buchstabenabstand</label>
+      <input id="letter" type="range" min="0" max="4" step="0.1" value="0" />
+    </div>
+
+    <div class="btns">
+      <button id="download">Download PNG</button>
+      <button class="secondary" id="reset">Zurücksetzen</button>
+      <span style="margin-left:auto; color:#666; font-size:12px">Tipp: Werte einmal sauber einstellen, dann nur noch Namen tippen 😊</span>
+    </div>
+  </section>
+
+  <section class="card canvas-wrap">
+    <canvas id="c" width="1536" height="1024" aria-label="Ticket Vorschau"></canvas>
+  </section>
+  <p class="hint">Hinweis: Lege dein Basisticket (ohne Namen) als <b>ticket_base.png</b> in denselben Ordner wie diese Seite. Position/Größe oben kannst du feinjustieren, damit „Passenger Name“ exakt sitzt.</p>
+</main>
+<footer>Swiss-Style Ticket Name Generator – lokal im Browser, keine Uploads.</footer>
+
+<script>
+(() => {
+  const BASE_IMAGE_URL = 'ticket_base.png'; // Ticket-Bild ohne Namen
+  const FONT_FAMILY = "'Helvetica Neue', Helvetica, Arial, system-ui, sans-serif";
+  const FONT_WEIGHT = 700;
+  const TEXT_COLOR = "#111";
+  const STROKE = {show:true, width:4, color:"#ffffff"};
+  const UPPERCASE = false;
+
+  const els = {
+    name: document.getElementById('name'),
+    size: document.getElementById('size'),
+    x: document.getElementById('x'),
+    y: document.getElementById('y'),
+    width: document.getElementById('width'),
+    letter: document.getElementById('letter'),
+    download: document.getElementById('download'),
+    reset: document.getElementById('reset'),
+    canvas: document.getElementById('c')
+  };
+
+  const ctx = els.canvas.getContext('2d');
+  const img = new Image();
+  img.src = BASE_IMAGE_URL;
+  img.onload = draw;
+  img.onerror = () => {
+    ctx.fillStyle = "#fff";
+    ctx.fillRect(0,0,els.canvas.width,els.canvas.height);
+    ctx.fillStyle = "#c00";
+    ctx.font = "20px " + FONT_FAMILY;
+    ctx.fillText("ticket_base.png nicht gefunden – lade dein Ticketbild hoch oder passe die Zeile BASE_IMAGE_URL an.", 24, 40);
+  };
+
+  function applyFont(px){
+    ctx.font = `${FONT_WEIGHT} ${px}px ${FONT_FAMILY}`;
+    ctx.fillStyle = TEXT_COLOR;
+    ctx.textBaseline = "alphabetic";
+  }
+
+  function wrapAndDrawText(text, x, y, maxWidth, lineHeight, strokeCfg, letterSpacing){
+    const words = text.split(/\\s+/);
+    let line = '';
+    let cursorY = y;
+
+    function measureWithSpacing(s){
+      let w = 0;
+      for (let i=0;i<s.length;i++){
+        w += ctx.measureText(s[i]).width;
+        if(i < s.length-1) w += letterSpacing;
+      }
+      return w;
+    }
+
+    function drawLine(str, xx, yy){
+      let cx = xx;
+      for (let i=0;i<str.length;i++){
+        const ch = str[i];
+        if(strokeCfg.show){
+          ctx.lineWidth = strokeCfg.width;
+          ctx.strokeStyle = strokeCfg.color;
+          ctx.strokeText(ch, cx, yy);
+        }
+        ctx.fillText(ch, cx, yy);
+        cx += ctx.measureText(ch).width + (i < str.length-1 ? letterSpacing : 0);
+      }
+    }
+
+    for (let n=0;n<words.length;n++){
+      const testLine = (line? line+' ':'') + words[n];
+      const mw = measureWithSpacing(testLine);
+      if (mw > maxWidth && n>0){
+        drawLine(line, x, cursorY);
+        line = words[n];
+        cursorY += lineHeight;
+      } else {
+        line = testLine;
+      }
+    }
+    drawLine(line, x, cursorY);
+  }
+
+  function draw(){
+    ctx.clearRect(0,0,els.canvas.width,els.canvas.height);
+    ctx.drawImage(img, 0, 0, els.canvas.width, els.canvas.height);
+
+    let name = (els.name.value || '').trim();
+    if (UPPERCASE) name = name.toUpperCase();
+
+    const size = parseInt(els.size.value,10);
+    const x = parseInt(els.x.value,10);
+    const y = parseInt(els.y.value,10);
+    const maxW = parseInt(els.width.value,10);
+    const letterSpacing = parseFloat(els.letter.value);
+
+    applyFont(size);
+    const lineHeight = Math.round(size * 1.25);
+
+    if(name){
+      wrapAndDrawText(name, x, y, maxW, lineHeight, STROKE, letterSpacing);
+    }
+  }
+
+  ['input','change'].forEach(ev=>{
+    els.name.addEventListener(ev, draw);
+    els.size.addEventListener(ev, draw);
+    els.x.addEventListener(ev, draw);
+    els.y.addEventListener(ev, draw);
+    els.width.addEventListener(ev, draw);
+    els.letter.addEventListener(ev, draw);
+  });
+
+  els.download.addEventListener('click', ()=>{
+    draw();
+    const a = document.createElement('a');
+    const cleanName = (els.name.value || 'Passenger').replace(/[^\\w\\-äöüÄÖÜß ]+/g,'').trim().replace(/\\s+/g,'_');
+    a.download = `BoardingPass_${cleanName}.png`;
+    a.href = els.canvas.toDataURL('image/png');
+    a.click();
+  });
+
+  els.reset.addEventListener('click', ()=>{
+    els.size.value = 28;
+    els.x.value = 120;
+    els.y.value = 205;
+    els.width.value = 680;
+    els.letter.value = 0;
+    draw();
+  });
+
+  draw();
+})();
+</script>
+</body>
+</html>
