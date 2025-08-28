@@ -16,8 +16,6 @@
   label{font-size:14px; color:var(--label); white-space:nowrap}
   input[type="text"]{flex:1; padding:12px 14px; border:1px solid #ddd; border-radius:10px; font-size:16px}
   button{appearance:none; border:1px solid var(--accent); background:var(--accent); color:#fff; padding:10px 14px; border-radius:10px; font-weight:600; cursor:pointer}
-  .canvas-wrap{padding:16px; display:flex; justify-content:center; align-items:center}
-  canvas{max-width:100%; height:auto; background:#fff; border-radius:10px; border:1px solid #eee}
   .hint{padding:0 16px 16px; color:#666; font-size:12px}
 </style>
 </head>
@@ -33,10 +31,7 @@
     </div>
   </section>
 
-  <section class="card canvas-wrap">
-    <canvas id="c" width="1536" height="1024" aria-label="Ticket Vorschau"></canvas>
-  </section>
-  <p class="hint">Falls das Ticket-Bild nicht erscheint: Lade <b>ticket_base.png</b> (dein Boardingpass ohne Namen) ins Repo.</p>
+  <p class="hint">Dein Boarding Pass wird nicht angezeigt, sondern direkt als Datei heruntergeladen.</p>
 </main>
 
 <script>
@@ -45,42 +40,35 @@
   const FONT_FAMILY = "'Helvetica Neue', Helvetica, Arial, system-ui, sans-serif";
   const FONT_WEIGHT = 700;
   const TEXT_COLOR = "#111";
-  const STROKE = {show:true, width:4, color:"#ffffff"};     // dünne weiße Kontur hinter dem Namen
-  const NAME_FONT_SIZE = 28;                                 // feste Schriftgröße für Name & Label
+  const STROKE = {show:true, width:4, color:"#ffffff"};
+  const NAME_FONT_SIZE = 28;
 
   const els = {
     name: document.getElementById('name'),
-    download: document.getElementById('download'),
-    canvas: document.getElementById('c')
+    download: document.getElementById('download')
   };
-  const ctx = els.canvas.getContext('2d');
+
+  // Verstecktes Canvas (nicht im Layout sichtbar)
+  const canvas = document.createElement('canvas');
+  canvas.width = 1536;
+  canvas.height = 1024;
+  const ctx = canvas.getContext('2d');
 
   const img = new Image();
-  img.src = BASE_IMAGE_URL + '?v=' + Date.now();
-  img.onload = draw;
-  img.onerror = () => {
-    ctx.fillStyle = "#fff"; ctx.fillRect(0,0,els.canvas.width,els.canvas.height);
-    ctx.fillStyle = "#c00"; ctx.font = "20px " + FONT_FAMILY;
-    ctx.fillText("ticket_base.png nicht gefunden – lade dein Ticketbild hoch.", 24, 40);
-  };
+  img.src = BASE_IMAGE_URL;
 
-  // Position der Beschriftung auf dem Ticket (bei Bedarf einmalig anpassen)
-  const baseX = 180;   // x-Startpunkt der Label-Zeile
-  const baseY = 293;   // y-Position der Label-Zeile
+  const baseX = 180; 
+  const baseY = 293; 
   const labelText = "Passenger Name:";
-  const gap = 20;      // Abstand zwischen Label und Name
+  const gap = 20;
 
-  function draw(){
-    ctx.clearRect(0,0,els.canvas.width,els.canvas.height);
-    ctx.drawImage(img, 0, 0, els.canvas.width, els.canvas.height);
+  function drawAndDownload(){
+    ctx.clearRect(0,0,canvas.width,canvas.height);
+    ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
 
-    // Schrift setzen
     ctx.font = `${FONT_WEIGHT} ${NAME_FONT_SIZE}px ${FONT_FAMILY}`;
     ctx.textBaseline = "top";
     ctx.fillStyle = TEXT_COLOR;
-
-    // Falls das Label NICHT Teil deines Basistickets ist, kannst du es hier mitzeichnen:
-    // ctx.fillText(labelText, baseX, baseY);
 
     const name = (els.name.value || '').trim();
     if (!name) return;
@@ -95,19 +83,16 @@
       ctx.strokeText(name, nameX, nameY);
     }
     ctx.fillText(name, nameX, nameY);
+
+    // Download starten
+    const a = document.createElement('a');
+    const clean = (name || 'Passenger').replace(/[^\w\-äöüÄÖÜß ]+/g,'').trim().replace(/\s+/g,'_');
+    a.download = `BoardingPass_${clean}.png`;
+    a.href = canvas.toDataURL('image/png');
+    a.click();
   }
 
-  els.name.addEventListener('input', draw);
-  els.download.addEventListener('click', ()=>{
-    draw();
-    const a = document.createElement('a');
-    const clean = (els.name.value || 'Passenger').replace(/[^\w\-äöüÄÖÜß ]+/g,'').trim().replace(/\s+/g,'_');
-    a.download = `BoardingPass_${clean}.png`;
-    a.href = els.canvas.toDataURL('image/png');
-    a.click();
-  });
-
-  draw();
+  els.download.addEventListener('click', drawAndDownload);
 })();
 </script>
 </body>
