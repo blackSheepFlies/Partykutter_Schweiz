@@ -1,86 +1,41 @@
 <!DOCTYPE html>
 <html lang="de">
 <head>
-  <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width,initial-scale=1" />
-  <title>Swiss Boat Party – Infos</title>
-  <style>
-    body {
-      font-family: system-ui, -apple-system, "Helvetica Neue", Helvetica, Arial, sans-serif;
-      margin: 0;
-      background: #f6f6f6;
-      color: #222;
-    }
-    header {
-      background: #d40000;
-      color: #fff;
-      padding: 24px;
-      text-align: center;
-    }
-    header h1 {
-      margin: 0;
-      font-size: 28px;
-      letter-spacing: 1px;
-    }
-    main {
-      max-width: 800px;
-      margin: 24px auto;
-      background: #fff;
-      border-radius: 12px;
-      box-shadow: 0 2px 6px rgba(0,0,0,0.1);
-      padding: 32px;
-    }
-    ul {
-      list-style: none;
-      padding: 0;
-    }
-    li {
-      margin: 14px 0;
-      padding-left: 2em;
-      position: relative;
-      line-height: 1.5;
-    }
-    li::before {
-      content: "🇨🇭";
-      position: absolute;
-      left: 0;
-      top: 0;
-      font-size: 1.2em;
-    }
-    footer {
-      text-align: center;
-      font-size: 12px;
-      color: #666;
-      margin: 40px 0 20px;
-    }
-  </style>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+<title>Swiss Boat Party – Event Infos</title>
+<style>
+  :root{ --swiss:#d40000; --ink:#1a1a1a; --line:#e5e7eb; --bg:#f6f6f6; }
+  body{margin:0; font-family:system-ui,-apple-system,"Helvetica Neue",Helvetica,Arial,sans-serif; color:var(--ink); background:var(--bg);}
+  main{max-width:800px; margin:0 auto; padding:20px;}
+  h1{color:var(--swiss);}
+  ul{padding-left:20px;}
+  li{margin-bottom:10px;}
+  .btn{appearance:none; border:1px solid var(--swiss); background:var(--swiss); color:#fff; padding:12px 16px; border-radius:12px; font-weight:800; cursor:pointer; text-decoration:none; display:inline-block; margin:10px 0;}
+  .btn:hover{background:#a80000}
+</style>
 </head>
 <body>
-  <header>
-    <h1>Swiss Boat Party</h1>
-  </header>
 
-  <main>
-    <p>Lieber Gast,</p>
-    <p>Hier ein paar weitere Informationen zu deinem Boardingpass:</p>
-    <ul>
-      <li>wir treffen uns spätestens am <b>31.08.2025 um 17:00 Uhr</b> am Historischen Hafen Berlin</li>
-      <li>Verkleide dich im Motto „Schweiz“ (das kann der Almöhler, die Kuh, ein Flugzeug, Pilot, Schoki etc. sein)</li>
-      <li>Auf dem Boot wird es ein Fotobuch mit Stiften, Stickern und eine Polaroidkamera geben. 
-          Mach dein bestes Partybild und kleb es ins Fotobuch, schmücke es und schreibe für Bernadette 
-          etwas Nettes für ihren Weg ins Swiss Cockpit.</li>
-      <li>Auf dem Boot wird es Musik geben (wenn du einen speziellen Musikwunsch hast, gerne vorab an Laurin senden)</li>
-      <li>Es wird Getränke geben (Bier, Sekt, Aperol und ein paar Softdrinks – hast du einen speziellen Wunsch, bringe es mit)</li>
-      <li>Es wird Muffins sowie Fingerfood in Form von kleinen Spießchen geben (Stärke dich vorher mit etwas Herzhaftem)</li>
-      <li>Jetzt noch zur Sicherheit an Bord: Sollte es dir oder jemand anderem nicht gut gehen, haben wir zwei Ansprechpartner der Crew an Bord. 
-          Melde dich frühzeitig, damit wir schnell helfen können.</li>
-      <li>BRINGE DEINEN BOARDINGPASS MIT - damit bekommst du einen coolen Reise-Sticker auf dein Ticket beim Einlass</li>
-      <li>Geschenke an Bernadette: Sie will sich einen Pilotenkoffer kaufen. Lege gerne einen symbolischen Betrag im Umschlag in die Kasse vor Ort (gerne auch anonym) oder scanne den Paypal QR Code vor ort, wenn du es lieber digital hast. So hat sie euch immer auf ihren Reisen dabei. Gerne kannst du natürlich auch was anderes schenken, wenn du magst.</li>
-    </ul>
-  </main>
+<main>
+  <!-- Zurück-Button oben -->
+  <a class="btn" href="index.html">← Zurück zum Check-in</a>
 
-  <footer>
-    © 2025 Swiss Boat Party – Boardingpass Infos
-  </footer>
+  <h1>Swiss Boat Party</h1>
+  <p>Lieber Gast, hier ein paar weitere Informationen zu deinem Boardingpass:</p>
+  <ul>
+    <li>Wir treffen uns spätestens am <b>31.08.2025 um 17:00 Uhr</b> am Historischen Hafen Berlin.</li>
+    <li>Verkleide dich im Motto „Schweiz“ (z. B. Almöhi, Kuh, Flugzeug, Pilot, Schoki …).</li>
+    <li>Auf dem Boot gibt es ein Fotobuch mit Stiften, Stickern und eine Polaroidkamera. Mach dein bestes Partybild, kleb es ein und schreibe Bernadette etwas Nettes für ihren Weg ins Swiss Cockpit.</li>
+    <li>Es wird Musik geben – hast du Musikwünsche, melde dich vorher bei Laurin.</li>
+    <li>Es gibt Getränke (Bier, Sekt, Aperol, Softdrinks). Besondere Wünsche? Bring gerne etwas mit.</li>
+    <li>Muffins und Fingerfood (kleine Spießchen) sind an Bord – iss vorher noch etwas Herzhaftes.</li>
+    <li>Sicherheit: Sollte es dir oder jemand anderem nicht gut gehen, haben wir zwei Ansprechpartner der Crew an Bord. Melde dich frühzeitig, damit wir helfen können.</li>
+  </ul>
+
+  <!-- Zurück-Button unten -->
+  <a class="btn" href="index.html">← Zurück zum Check-in</a>
+</main>
+
 </body>
 </html>
